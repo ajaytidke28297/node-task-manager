@@ -1,19 +1,61 @@
-exports.getTasks = (req, res, next) => {
-  res.send("All Items");
+const Task = require("../models/Task");
+
+exports.getTasks = async (req, res, next) => {
+  try {
+    const tasks = await Task.find();
+    res.status(200).json({ tasks });
+  } catch (err) {
+    res.status(403).json({ message: "Validation Failed" });
+  }
 };
 
-exports.createTask = (req, res, next) => {
-  res.send("Create Task");
+exports.createTask = async (req, res, next) => {
+  try {
+    const task = await Task.create(new Task(req.body));
+    if (!task) {
+      throw new Error("Task not found");
+    }
+    res.status(201).json(task);
+  } catch (err) {
+    res.status(403).json({ message: "Validation Failed" });
+  }
 };
 
-exports.getTask = (req, res, next) => {
-  res.send("Get Task");
+exports.getTask = async (req, res, next) => {
+  try {
+    const task = await Task.findOne({ _id: req.params.id });
+    res.status(200).json({ task });
+  } catch (error) {
+    console.log(error);
+    res.status(403).json({ message: "Validation Failed" });
+  }
 };
 
-exports.updateTask = (req, res, next) => {
-  res.send("Update Task");
+exports.updateTask = async (req, res, next) => {
+  try {
+    const task = await Task.findOneAndUpdate({ _id: req.params.id }, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!task) {
+      throw new Error("Task not found");
+    }
+    res.status(200).json({ task });
+  } catch (error) {
+    console.log(error);
+    res.status(403).json({ message: "Validation Failed" });
+  }
 };
 
-exports.deleteTask = (req, res, next) => {
-  res.send("delete Task");
+exports.deleteTask = async (req, res, next) => {
+  try {
+    const task = await Task.findOneAndDelete({ _id: req.params.id });
+    if (!task) {
+      throw new Error("Task not found");
+    }
+    res.status(200).json({ task });
+  } catch (error) {
+    console.log(error);
+    res.status(403).json({ message: "Validation Failed" });
+  }
 };

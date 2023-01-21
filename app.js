@@ -1,26 +1,24 @@
+const path = require("path");
 const express = require("express");
-
-const mongoose = require("mongoose");
-
 const app = express();
-
 const tasks = require("./routes/tasks");
+const connectDB = require("./db/connect");
+require("dotenv").config();
 
 app.use(express.json());
 
-app.get("/hello", (req, res, next) => {
-  res.send("Task Manager app");
-});
-
+app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/v1/tasks", tasks);
 
 const port = 3000;
 
-mongoose
-  .connect("mongodb+srv://ajay:ajay123@cluster0.ohqbmka.mongodb.net/store")
-  .then((result) => {
+const start = async () => {
+  try {
+    await connectDB(process.env.MONGO_URI);
     app.listen(port, console.log(`server is listening on port ${port}`));
-  })
-  .catch((err) => {
+  } catch (err) {
     console.log(err);
-  });
+  }
+};
+
+start();
